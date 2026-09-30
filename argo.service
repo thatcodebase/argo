@@ -1,0 +1,16 @@
+# Aro Protocol Server
+# The service will fork() when the "service" program argument is provided.
+# Set the service type below to "forking".
+# The service handles SIG_INT (2) to exit mainline.
+
+[Unit]
+Description=Argo Protocol Server
+
+[Service]
+Type=forking
+ExecStart=/usr/bin/argo service
+ExecStop=/bin/kill -2 $MAINPID
+WorkingDirectory=/var/opt/argo
+
+[Install]
+WantedBy=multi-user.target

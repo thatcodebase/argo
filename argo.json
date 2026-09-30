@@ -1,0 +1,106 @@
+{
+  ".class": "el.gato.grande",
+  ".kind": "obj",
+  "version": {
+    ".name": "Version",
+    ".kind": "param",
+    ".class": "harman.common.version",
+    ".type": "string",
+    ".default": "1.0.0.0",
+    ".access": "c"
+  },
+  "configuration": {
+    ".name": "Configuration",
+    ".kind": "obj",
+    ".class": "harman.common.configuration",
+    ".scope": "config",
+    "device": {
+      ".name": "Device",
+      ".kind": "obj",
+      ".class": "harman.common.device",
+      "classname": {
+        ".name": "Classname",
+        ".kind": "param",
+        ".type": "string",
+        ".default": "el.gato.grande",
+        ".access": "c"
+      },
+      "descriptorlocation": {
+        ".name": "Descriptor Location",
+        ".kind": "param",
+        ".type": "string",
+        ".default": "el.gato.grande.json",
+        ".access": "c"
+      },
+      "devicestate": {
+        ".name": "Device State",
+        ".kind": "param",
+        ".type": "string",
+        ".default": "Running",
+        ".access": "ro"
+      },
+      "family": {
+        ".name": "Family",
+        ".kind": "param",
+        ".type": "string",
+        ".default": "Gato",
+        ".access": "c"
+      },
+      "guid": {
+        ".name": "GUID",
+        ".kind": "param",
+        ".class": "harman.common.guid",
+        ".type": "string",
+        ".default": "58a00a62-531c-42ff-ae36-75dc0975c4a9",
+        ".access": "ro"
+      },
+      "label": {
+        ".name": "Label",
+        ".kind": "param",
+        ".type": "string",
+        ".default": "El Gato Grande"
+      },
+      "location": {
+        ".name": "Location",
+        ".kind": "param",
+        ".type": "string",
+        ".default": "Tercer Circulo"
+      },
+      "manufacturer": {
+        ".name": "Manufacturer",
+        ".kind": "param",
+        ".type": "string",
+        ".default": "El",
+        ".access": "c"
+      },
+      "model": {
+        ".name": "Model",
+        ".kind": "param",
+        ".type": "string",
+        ".default": "Grande",
+        ".access": "c"
+      },
+      "name": {
+        ".name": "Name",
+        ".kind": "param",
+        ".type": "string",
+        ".default": "Primero Entre Iguale"
+      },
+      "protocolversion": {
+        ".name": "Protocol Version",
+        ".kind": "param",
+        ".type": "string",
+        ".default": "1.34.0.2",
+        ".access": "c"
+      },
+      "version": {
+        ".name": "Firmware Version",
+        ".kind": "param",
+        ".class": "harman.common.version",
+        ".type": "string",
+        ".default": "1.0.0.0",
+        ".access": "ro"
+      }
+    }
+  }
+}
