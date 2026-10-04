@@ -25,24 +25,21 @@ namespace logger {
             debug
         };
     }
-    namespace max {
-        enum
-        {
-            size = 512
-        };
-    }
-    constexpr const char* prelog = "prelog";
-    constexpr const char* suffix = "log";
 }
 
 #define wrt(...) LoggerWrite(logger::level::write, __VA_ARGS__)
+#define err(...) LoggerWrite(logger::level::error, __VA_ARGS__)
+#define wrn(...) LoggerWrite(logger::level::warning, __VA_ARGS__)
 #define inf(...) LoggerWrite(logger::level::info, __VA_ARGS__)
+#define smy(...) LoggerWrite(logger::level::summary, __VA_ARGS__)
+#define dtl(...) LoggerWrite(logger::level::detail, __VA_ARGS__)
+#define trc(...) LoggerWrite(logger::level::trace, __VA_ARGS__)
+#define dbg(...) LoggerWrite(logger::level::debug, __VA_ARGS__)
 
 class Logger final
 {
     std::atomic<int> _appErr;
     std::atomic<int> _osErr;
-
     std::atomic<unsigned int> _level;
 
     std::atomic<bool> _console;
@@ -67,7 +64,7 @@ public:
     void OsErr(int osErr);
 
     unsigned int Level();
-    void Level(unsigned int level);
+    bool Level(unsigned int level);
     bool Console();
     void Console(bool console);
     bool Prelog();
@@ -77,13 +74,15 @@ public:
     void Prefix(const char* prefix);
     void Base(const char* base);
     void Suffix(const char* suffix);
-
     void Write(const char* msg);
 };
 
 int AppErr();
 void AppErr(int appErr);
+int OsErr();
+void OsErr(int osErr);
 
+bool LoggerLevel(const char* level);
 void LoggerConsole(bool console);
 void LoggerPrelog(bool prelog);
 

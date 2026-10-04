@@ -227,6 +227,8 @@ uint8_t ByteRuns[128][8] = {
     { 1, 7, 0, 0, 0, 0, 0, 0 } //  01111111 10000000
 };
 
+/*
+
 //  MD5 test vectors 1-7: RFC 1321
 
 uint8_t* const md5_vector_1 = (uint8_t*)"";
@@ -1711,8 +1713,12 @@ uint8_t* inthex_vector_1 = (uint8_t*)
                             "respect to the opinions of mankind requires that they " \
                             "should declare the causes which impel them to the separation."
 
+*/
+
 bool _all = false;
 bool _dump = false;
+
+/*
 
 void queryRun(const char* prompt, void(*fn)())
 {
@@ -4069,6 +4075,8 @@ void testEncoding()
     queryRun("X.509 Encoding", testX509);
 }
 
+*/
+
 void runTests()
 {
     printf("\n");
@@ -4078,6 +4086,7 @@ void runTests()
     printf("sizeof(long long) %2zd bytes\n", sizeof(long long));
     printf("\n");
 
+/*
     queryRun("Message Digest", testDigestAlgs);
     queryRun("Hashed MAC", testHMACAlgs);
     queryRun("Symmetric Encryption", testSymmetricEncryption);
@@ -4086,13 +4095,14 @@ void runTests()
     queryRun("Asymmetric Encryption", testAsymmetricEncryption);
     queryRun("Compression", testCompression);
     queryRun("Encoding", testEncoding);
+*/
 
     printf("Tests Completed\n");
 }
 
 int usage()
 {
-    printf("Usage: testava test [all] [dump]\n");
+    printf("Usage: testargo test [all] [dump]\n");
     return 0;
 }
 
@@ -4100,7 +4110,7 @@ int __cdecl main(int argc, char* argv[])
 {
     printf("Argo Test Program [0.X]\n");
     printf("Copyright 2010 ThatCodeBase. MIT License.\n");
-    if (argc > 4 || (argc == 2 && !strcmp(argv[1], testava::help)))
+    if (argc > 4 || (argc == 2 && !strcmp(argv[1], testargo::help)))
         return usage();
     char* args[4] = { 0 };
     for (int n = 0; n < argc; n++)
@@ -4110,14 +4120,14 @@ int __cdecl main(int argc, char* argv[])
         fflush(stdin);
         fgets(cmd, sizeof cmd - 1, stdin);
         char* nexttok = cmd;
-        for (int n = 1; nexttok && n < 4; n++)
-            args[n] = tokstrx(nexttok, " \t", " \t\n", &nexttok);
+        //for (int n = 1; nexttok && n < 4; n++)
+        //    args[n] = tokstrx(nexttok, " \t", " \t\n", &nexttok);
     }
-    if (args[1] && !strcmp(args[1], testava::test)) {
+    if (args[1] && !strcmp(args[1], testargo::test)) {
         for (int n = 2; n < 4 && args[n]; n++) {
-            if (!strcmp(args[n], testava::all))
+            if (!strcmp(args[n], testargo::all))
                 _all = true;
-            else if (!strcmp(args[n], testava::dump))
+            else if (!strcmp(args[n], testargo::dump))
                 _dump = true;
         }
         runTests();

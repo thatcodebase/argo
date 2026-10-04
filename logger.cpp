@@ -6,6 +6,45 @@
 
 using namespace std;
 
+typedef struct loglevelname {
+    const char* _name;
+    unsigned int _level;
+} LOGLEVELNAME;
+
+namespace logger {
+    namespace max {
+        enum {
+            size = 512
+        };
+    }
+    namespace level {
+        namespace name {
+            constexpr const char* error = "error";
+            constexpr const char* warning = "warning";
+            constexpr const char* info = "info";
+            constexpr const char* summary = "summary";
+            constexpr const char* detail = "detail";
+            constexpr const char* trace = "trace";
+            constexpr const char* debug = "debug";
+        }
+    }
+    const LOGLEVELNAME levels[] = {
+        {logger::level::name::error, logger::level::error},
+        {logger::level::name::warning, logger::level::warning},
+        {logger::level::name::info, logger::level::info},
+        {logger::level::name::summary, logger::level::summary},
+        {logger::level::name::detail, logger::level::detail},
+        {logger::level::name::trace, logger::level::error},
+        {logger::level::name::debug, logger::level::debug},
+        {0,0}
+    };
+    constexpr const char* base = "";
+    constexpr const char* path = "";
+    constexpr const char* prefix = "";
+    constexpr const char* prelog = "prelog";
+    constexpr const char* suffix = "log";
+}
+
 Logger theLogger;
 
 Logger::Logger()
@@ -66,9 +105,10 @@ unsigned int Logger::Level()
     return _level.load(memory_order_relaxed);
 }
 
-void Logger::Level(unsigned int level)
+bool Logger::Level(unsigned int level)
 {
-    _level.store(level, memory_order_relaxed);
+    _level.store(level > logger::level::debug ? logger::level::debug : level, memory_order_relaxed);
+    return true;
 }
 
 bool Logger::Console()
@@ -199,6 +239,23 @@ int AppErr()
 void AppErr(int appErr)
 {
     theLogger.AppErr(appErr);
+}
+
+int OsErr()
+{
+    return theLogger.OsErr();
+}
+
+void OsErr(int osErr)
+{
+    theLogger.OsErr(osErr);
+}
+
+bool LoggerLevel(const char* level)
+{
+    const LOGLEVELNAME* lln = &logger::levels[0];
+    for (; lln->_name && strcmp(level, lln->_name); lln++);
+    return (lln->_name ? theLogger.Level(lln->_level) : false);
 }
 
 void LoggerConsole(bool console)

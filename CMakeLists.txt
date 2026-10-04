@@ -3,8 +3,16 @@ project(ava LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 11)
 
 set (LIBARGO_SRCS
+	api.cpp
+	asn.cpp
+	buffer.cpp
+	channel.cpp
+	digest.cpp
 	driver.cpp
 	logger.cpp
+	sha.cpp
+	socket.cpp
+	uri.cpp
 )
 set (PUB_HDRS
 	iapi.h
