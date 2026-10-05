@@ -2,6 +2,7 @@
 
 #include "idriver.h"
 #include "channel.h"
+#include "udpchannel.h"
 
 #include <atomic>
 #include <mutex>
@@ -50,6 +51,9 @@ class Driver final
 #endif
     Socket _v4tcp;
     Socket _v6tcp;
+
+    UdpChannel _udpChannel4;
+    UdpChannel _udpChannel6;
 
     Channel _channel[driver::channels];
 

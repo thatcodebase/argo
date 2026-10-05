@@ -58,7 +58,7 @@ namespace driver {
             copyright,
             usage,
 
-            // Service intallation
+            //  Service intallation
 
             installing,
             access,
@@ -79,7 +79,7 @@ namespace driver {
             closesc,
             installed,
 
-            // Service uninstallation
+            //  Service uninstallation
 
             uninstalling,
             missing,
@@ -88,12 +88,12 @@ namespace driver {
             remove,
             uninstalled,
 
-            // Service dispatch
+            //  Service dispatch
 
             console,
             dispatch,
 
-            // Linux/macOS daemon startup
+            //  Linux/macOS daemon startup
 
             pipe1,
             alarm1,
@@ -112,11 +112,11 @@ namespace driver {
             stdout_,
             stderr_,
 
-            // Windows startup
+            //  Windows startup
 
             wsastartup,
 
-            // Configuration
+            //  Configuration
 
             regopenkeyex,
             reggetvalue,
@@ -128,7 +128,7 @@ namespace driver {
             modelloaded,
             complete,
 
-            // Shutdown
+            //  Shutdown
 
             terminate,
             servicestop,
@@ -141,7 +141,7 @@ namespace driver {
         constexpr const char* title = "Title";
         constexpr const char* copyright = "Copyright";
 
-        // Service installation
+        //  Service installation
 
         constexpr const char* installing = "Installing service";
         constexpr const char* access = "Administrative privilege is required";
@@ -162,7 +162,7 @@ namespace driver {
         constexpr const char* closesc = "CloseServiceHandle error";
         constexpr const char* installed = "Service installed";
 
-        // Service uninstallation
+        //  Service uninstallation
 
         constexpr const char* uninstalling = "Uninstalling service";
         constexpr const char* missing = "Service not found";
@@ -195,7 +195,7 @@ namespace driver {
         constexpr const char* stdout_ = "dup2(STDOUT) error";
         constexpr const char* stderr_ = "dup2(STDERR) error";
 
-        // Configuration
+        //  Configuration
 
         constexpr const char* regopenkeyex = "RegOpenKeyEx error";
         constexpr const char* reggetvalue = "RegGetValue error";
@@ -207,7 +207,7 @@ namespace driver {
         constexpr const char* modelloaded = "Model loaded";
         constexpr const char* complete = "Configuration completed";
 
-        // Shutdown
+        //  Shutdown
 
         constexpr const char* servicestop = "Service stopping";
         constexpr const char* stopping = "Exiting main loop";
@@ -237,21 +237,21 @@ Driver theDriver;
 
 Driver::Driver()
 {
-    // Initialize members to default values.
+    //  Initialize members to default values.
 
     Init();
 }
 
 Driver::~Driver()
 {
-    // Release allocated storage and intialize members to default values.
+    //  Release allocated storage and intialize members to default values.
 
     Reset();
 }
 
 void Driver::Init()
 {
-    // Initialize members to default values.
+    //  Initialize members to default values.
 
     _running.store(false, memory_order_relaxed);
     _stopping.store(false, memory_order_relaxed);
@@ -260,12 +260,14 @@ void Driver::Init()
 
     _port = driver::port;
 
+    _first = nullptr;
+    _last = nullptr;
 #if defined(_WIN32)
-    _hscm = nullptr;
-    _lock = nullptr;
+    _hscm = 0;
+    _lock = 0;
     _handle = 0;
-    _section = { 0 };
-    _status = { 0 };
+    memset(&_section, 0, sizeof _section);
+    memset(&_status, 0, sizeof _status);
     _dispatch[0] = { 0 };
     _dispatch[1] = { 0 };
 #endif
@@ -273,7 +275,7 @@ void Driver::Init()
 
 void Driver::Reset()
 {
-    // Release allocated storage.
+    //  Release allocated storage.
 
     string().swap(_config);
     string().swap(_copyright);
@@ -285,7 +287,7 @@ void Driver::Reset()
     string().swap(_title);
     string().swap(_usage);
 
-    // Initialize members to default values.
+    //  Initialize members to default values.
 
     Init();
 }
@@ -476,8 +478,9 @@ void Driver::Main(DWORD argc, LPSTR* argv)
     _status.dwWaitHint = 0;
     SetServiceStatus(_handle, &_status);
     LeaveCriticalSection(&_section);
-    if (argc)
+    if (argc) {
         _name = argv[0];
+    }
     inf("I%04d %s (%s)", driver::cond::servicestart, driver::message::servicestart, _name.c_str());
     Run(argc, argv);
     inf("I%04d %s (%s)", driver::cond::servicestop, driver::message::servicestop, _name.c_str());
@@ -700,9 +703,9 @@ void Driver::CloseServiceManager()
 #if defined(_WIN32)
 BOOL WINAPI ServiceHandleTerm(DWORD fdwCtrlType)
 {
-    // The Service method sets ServiceHandleTerm as the closure event handler.
-    // We are on the main thread here. We cannot log because theLogger has been
-    // destructed. We set _stopping to true so the service thread will exit.
+    //  The Service method sets ServiceHandleTerm as the closure event handler.
+    //  We are on the main thread here. We cannot log because theLogger has been
+    //  destructed. We set _stopping to true so the service thread will exit.
 
     switch (fdwCtrlType) {
     case CTRL_C_EVENT:
@@ -732,11 +735,19 @@ bool Driver::Service(int argc, char* argv[])
 {
 #if defined(_WIN32)
     if (argc > 1 && argv[1]) {
+
+        //  The user may specify that the service be installed with a given
+        //  name. If not specified, the name provided during configuration
+        //  is used.
+
         const char* serviceName = _name.c_str();
         if (argc > 2 && argv[2]) {
             serviceName = argv[2];
         }
         if (!strcmp(argv[1], driver::service)) {
+
+            //  The user may specify that the app be run as a service.
+
             _dispatch[0].lpServiceName = (char*)serviceName;
             _dispatch[0].lpServiceProc = ServiceMain;
             if (!StartServiceCtrlDispatcher(_dispatch)) {
@@ -758,6 +769,9 @@ bool Driver::Service(int argc, char* argv[])
             return false;
         }
         if (!strcmp(argv[1], driver::install)) {
+
+            //  The user may specify that the app be installed as a service.
+
             wrt("I%04d %s", driver::cond::title, _title.empty() ? "Title" : _title.c_str());
             wrt("I%04d %s", driver::cond::copyright, _copyright.empty() ? "Copyright" : _copyright.c_str());
             wrt("I%04d %s (%s)", driver::cond::installing, driver::message::installing, serviceName);
@@ -768,6 +782,9 @@ bool Driver::Service(int argc, char* argv[])
             return false;
         }
         if (!strcmp(argv[1], driver::uninstall)) {
+
+            //  The user may specify that the service be uninstalled.
+
             wrt("I%04d %s", driver::cond::title, _title.empty() ? "Title" : _title.c_str());
             wrt("I%04d %s", driver::cond::copyright, _copyright.empty() ? "Copyright" : _copyright.c_str());
             wrt("I%04d %s (%s)", driver::cond::uninstalling, driver::message::uninstalling, serviceName);
@@ -1187,18 +1204,23 @@ bool Driver::GetModel()
 
 void Driver::Configure(int argc, char* argv[])
 {
-    // Configure is called before any additional thread is started. So, we do
-    // not need to provide for concurrency here.
+    //  Configure is called before any additional thread is started. So, we do
+    //  not need to provide for concurrency here.
 
     LoggerPrefix(_name.c_str());
     LoggerSuffix(driver::logsuffix);
 
-    //  Set default port number for our sockets. This can be overridden in
-    //  the configuration.
+    //  Set default port number for our sockets. This can be overridden in the
+    //  configuration.
 
     _v4tcp.Port(driver::port);
     _v6tcp.Port(driver::port);
-    
+    _udpChannel4.Sock().Port(driver::port);
+    _udpChannel6.Sock().Port(driver::port);
+
+    //  Read and apply configuration settings from the registry, environment,
+    //  configuration file and program arguments.
+
 #if defined(_WIN32)
     GetRegistryVars();
 #endif
@@ -1208,8 +1230,8 @@ void Driver::Configure(int argc, char* argv[])
     GetArgVars(argc, argv);
     GetModel();
 
-    // Configuration is complete. So, spool any prelog messages into the
-    // configured log path and file and close the prelog file.
+    //  Configuration is complete. So, spool any prelog messages into the
+    //  configured log path and file and close the prelog file.
 
     LoggerPrelog(false);
     inf("I%04d %s", driver::cond::complete, driver::message::complete);
@@ -1252,13 +1274,13 @@ void Driver::CloseAddress(Socket& tcp, Socket& udp)
 
 bool Driver::Initialize(int argc, char* argv[])
 {
-    // Log the application title and copyright.
+    //  Log the application title and copyright.
 
     wrt("I%04d %s", driver::cond::title, _title.empty() ? driver::message::title : _title.c_str());
     wrt("I%04d %s", driver::cond::copyright, _copyright.empty() ? driver::message::copyright : _copyright.c_str());
 #if defined(_WIN32)
 
-    // Initialize Windows sockets.
+    //  Initialize Windows sockets.
 
     WSADATA wsadata{ 0 };
     int rc = WSAStartup(WINSOCKVERSION, &wsadata);
@@ -1269,16 +1291,19 @@ bool Driver::Initialize(int argc, char* argv[])
     Winsock(true);
 #endif
 
-    // Apply application configuration from registry, environment, etc.
+    //  Apply application configuration from registry, if runing on Windows, the
+    //  environment settings, configuration file, and program arguments.
 
     Configure(argc, argv);
 
-    // Open the TCP listener for IPv4.
+    //  Open TCP and UDP listeners for IPv4 and IPv6.
 
-    if (!OpenAddress(_v4tcp)) {
+    if (!OpenAddress(_v4tcp, _udpChannel4.Sock())) {
         return false;
     }
-
+    if (!OpenAddress(_v6tcp, _udpChannel6.Sock(), true)) {
+        return false;
+    }
     return true;
 }
 
@@ -1341,6 +1366,17 @@ Channel* Driver::Dequeue()
 
 void Driver::ServiceChannel()
 {
+    //  We have one IPv4 and one IPv6 channel dedicated to UDP. Service each of
+    //  these channels on each iteration since a connection is not relevant.
+
+    _udpChannel4.Service();
+    _udpChannel6.Service();
+
+    //  For TCP, dequeue a channel not in the ready state in round-robin order.
+    //  If one is found, service the channel. Return it to the queue only if
+    //  the state is not ready. Ready channels are not queued because there is
+    //  no work to perform on them.
+
     Channel* channel = Dequeue();
     if (channel) {
         channel->Service();
@@ -1352,8 +1388,8 @@ void Driver::ServiceChannel()
 
 void Driver::Mainline()
 {
-    // While we are not stopping check for any new connection and then service
-    // the next channel.
+    //  While we are not stopping check for any new connection and then service
+    //  the next channel.
 
     while (!Stopping()) {
         GetClient();
@@ -1365,13 +1401,13 @@ void Driver::Mainline()
 
 void Driver::Finalize()
 {
-    // Shutdown and close TCP and UDP listeners on both IPv4 and IPv6.
+    //  Shutdown and close TCP and UDP listeners on both IPv4 and IPv6.
 
-    //CloseAddress(_v4tcp, _udpChannel4.Sock());
-    //CloseAddress(_v6tcp, _udpChannel6.Sock());
+    CloseAddress(_v4tcp, _udpChannel4.Sock());
+    CloseAddress(_v6tcp, _udpChannel6.Sock());
 #if defined(_WIN32)
 
-    // Finalize Windows sockets.
+    //  Finalize Windows sockets.
 
     if (Winsock()) {
         WSACleanup();
@@ -1408,7 +1444,7 @@ bool Driver::Start(int argc, char* argv[])
 
     // If Service returned true, we continue. Now if the "service" argument was
     // passed on Linux or macOS, we are already forked and can enter the Run
-    // method on this task and then return false since there is no console.
+    // method on this thread and then return false since there is no console.
 
     if (Daemon()) {
         Run(argc, argv);

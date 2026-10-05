@@ -143,14 +143,13 @@
     <ClInclude Include="..\..\asn.h" />
     <ClInclude Include="..\..\buffer.h" />
     <ClInclude Include="..\..\channel.h" />
-    <ClInclude Include="..\..\digest.h" />
     <ClInclude Include="..\..\driver.h" />
     <ClInclude Include="..\..\iapi.h" />
     <ClInclude Include="..\..\idriver.h" />
     <ClInclude Include="..\..\logger.h" />
     <ClInclude Include="..\..\oid.h" />
-    <ClInclude Include="..\..\sha.h" />
     <ClInclude Include="..\..\socket.h" />
+    <ClInclude Include="..\..\udpchannel.h" />
     <ClInclude Include="..\..\uri.h" />
   </ItemGroup>
   <ItemGroup>
@@ -158,11 +157,10 @@
     <ClCompile Include="..\..\asn.cpp" />
     <ClCompile Include="..\..\buffer.cpp" />
     <ClCompile Include="..\..\channel.cpp" />
-    <ClCompile Include="..\..\digest.cpp" />
     <ClCompile Include="..\..\driver.cpp" />
     <ClCompile Include="..\..\logger.cpp" />
-    <ClCompile Include="..\..\sha.cpp" />
     <ClCompile Include="..\..\socket.cpp" />
+    <ClCompile Include="..\..\udpchannel.cpp" />
     <ClCompile Include="..\..\uri.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

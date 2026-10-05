@@ -71,7 +71,7 @@ bool URI::Put(char *uri_s)
             _port = uri::port::smtp;
             p = t + 1;
         } else {
-            _protocol = uri::protocol::file;
+            _protocol = uri::protocol::http;
         }
     }
 

@@ -7,11 +7,10 @@ set (LIBARGO_SRCS
 	asn.cpp
 	buffer.cpp
 	channel.cpp
-	digest.cpp
 	driver.cpp
 	logger.cpp
-	sha.cpp
 	socket.cpp
+	udpchannel.cpp
 	uri.cpp
 )
 set (PUB_HDRS

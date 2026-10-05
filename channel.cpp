@@ -61,7 +61,6 @@ void Channel::Init()
 void Channel::Reset()
 {
     _uri.Reset();
-    _sha256.Reset();
     _socket.Reset();
     _read.Reset();
     _write.Reset();
@@ -70,13 +69,30 @@ void Channel::Reset()
 
 void Channel::Read()
 {
+    //  Allocate storage for the read buffer if we have not yet.
+
     if (!_read.Size()) {
         _read.Resize(channel::size);
     }
+
+    //  If there is data already in the read buffer that has not yet been
+    //  processed, move it to the front of the buffer. Then, compute how much
+    //  room remains in the buffer that can hold additional input data.
+
     _read.Front();
     size_t len = _read.Avail();
-    if (_socket.Read(_read.Tail(), &len)) {
-        _read.Extend(len);
+
+    //  If there is room in the input buffer to read data, try to read more
+    //  data now. If the read fails, reset the channel. If no room remains
+    //  now to read data, then the a protocol error has occurred since the
+    //  buffer is not large enough to hold single request.
+
+    if (len) {
+        if (_socket.Read(_read.Tail(), &len)) {
+            _read.Extend(len);
+        } else {
+            Reset();
+        }
     } else {
         Reset();
     }
@@ -163,7 +179,14 @@ uint8_t* Channel::Prefetch(size_t remain)
 
 void Channel::Connected()
 {
+    //  A connection has arrived on the channel. We will wait until _expires
+    //  for data to be readable on the connection.
+
     if (_socket.Readable()) {
+
+        //  Readable data has arrived. Clear the _read buffer and read enough
+        //  bytes to determine the protocol.
+
         _read.Reset();
         _state = channel::state::needfirstbytes;
         NeedFirstBytes();
@@ -172,12 +195,20 @@ void Channel::Connected()
 
 void Channel::NeedFirstBytes()
 {
+    //  We need at least three bytes to determine if this is an implicit TLS
+    //  client hello or a recognized unencrypted message such as HTTP, etc.
+
     if (_read.Length() < 3) {
         Read();
         if (_read.Length() < 3) {
             return;
         }
     }
+
+    //  We have at least three bytes. Check first if this looks like a TLS
+    //  message. If it is, we need at least five bytes to determine the TLS
+    //  version. Otherwise, we need a complete request.
+
     uint8_t* p = _read.Head();
     if (tls::rec::handshake == *p) {
         _remain = 5;
@@ -269,7 +300,6 @@ void Channel::NeedHandShake()
     if (!p) {
         return;
     }
-    _sha256.Update(p, 4);
 
 }
 
@@ -295,6 +325,10 @@ void Channel::NeedDecryptedHandshake()
 
 void Channel::NeedRequest()
 {
+    //  A complete request will terminate with a newline character (\n). It may
+    //  take several calls to Read before a complete request is obtained. In the
+    //  mean time, write any data pending in the output queue before reading.
+
     if (_write.Length()) {
         Write();
         if (_write.Length()) {
@@ -415,8 +449,9 @@ bool Channel::CheckHttpVersion(uint8_t* p)
 {
     if ((_H != *p || _T != *(p + 1) || _T != *(p + 2) || _P != *(p + 3) || _slash != *(p + 4))
         || (_0 != *(p + 5) && _1 != *(p + 5)) || (_period != *(p + 6))
-        || (_9 != *(p + 7) && _0 != *(p + 7) && _1 != *(p + 7)) || *(p + 8))
+        || (_9 != *(p + 7) && _0 != *(p + 7) && _1 != *(p + 7)) || *(p + 8)) {
         return false;
+    }
     return true;
 }
 
@@ -439,24 +474,51 @@ bool Channel::CheckHttpSupportedVersion(uint8_t* p)
 
 void Channel::NeedHttpHeader()
 {
+    //  We are trying to read a complete HTTP header. This may require more
+    //  than one read. In the mean time, if we have data pending in our write
+    //  buffer, write that now.
+
     if (_write.Length()) {
         Write();
         if (_write.Length()) {
             return;
         }
     }
+
+    //  If our read buffer is empty, read some data now. Check if any data was
+    //  read. If none, return.
+
     if (!_read.Length()) {
         Read();
         if (!_read.Length()) {
             return;
         }
     }
+
+    //  Search for a newline character to terminate the header. If one is found,
+    //  proceed to process the header.
+
     uint8_t* p = _read.Head();
     uint8_t* q = _read.Tail();
     for (; (p < q) && (_lf != *p); p++);
     if (_lf == *p) {
         _state = channel::state::haveheader;
         HaveHttpHeader();
+    } else if (_read.Avail()) {
+
+        //  We had input data but it was not a complete header. So if we
+        //  have room remaining in the input buffer, read more data now.
+
+        Read();
+        if (!_read.Length()) {
+            return;
+        }
+    } else {
+
+        //  If we have no header and no more room remaining, then our buffer is
+        //  full and we have a protocol error.
+
+        Reset();
     }
 }
 
@@ -570,7 +632,6 @@ void Channel::Close()
     _haveChangeCipherSpec = false;
 
     _uri.Reset();
-    _sha256.Reset();
 
     _socket.Reset();
     _read.Reset();

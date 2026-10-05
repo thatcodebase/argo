@@ -18,15 +18,6 @@
     <ClInclude Include="..\..\api.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\driver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\iapi.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\idriver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\ascii.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -39,7 +30,13 @@
     <ClInclude Include="..\..\channel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\digest.h">
+    <ClInclude Include="..\..\driver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\iapi.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\idriver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\logger.h">
@@ -48,10 +45,10 @@
     <ClInclude Include="..\..\oid.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\sha.h">
+    <ClInclude Include="..\..\socket.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\socket.h">
+    <ClInclude Include="..\..\udpchannel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\uri.h">
@@ -59,12 +56,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\driver.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\logger.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\api.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -77,13 +68,16 @@
     <ClCompile Include="..\..\channel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\digest.cpp">
+    <ClCompile Include="..\..\driver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\sha.cpp">
+    <ClCompile Include="..\..\logger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\socket.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\udpchannel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\uri.cpp">

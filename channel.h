@@ -1,7 +1,6 @@
 #pragma once
 
 #include "buffer.h"
-#include "sha.h"
 #include "socket.h"
 #include "uri.h"
 
@@ -98,7 +97,6 @@ class Channel {
     bool _haveChangeCipherSpec;
 
     URI _uri;
-    SHA256 _sha256;
 
 protected:
     Socket _socket;

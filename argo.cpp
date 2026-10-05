@@ -32,7 +32,7 @@ int __cdecl main(int argc, char* argv[])
     //  configuration and will run in the foreground. If the program will
     //  run as a service or daemon, the background process will have been
     //  forked and this parent process may exit. Start also returns false
-    //  if an error occurred durring initialization.
+    //  if an error occurred during initialization.
 
     if (driver.Start(argc, argv)) {
         string line;
