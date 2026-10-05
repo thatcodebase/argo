@@ -1,0 +1,8 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="argo.vcxproj" Id="c4ab0c31-0cfe-48a2-9431-8f9e8167445a" />
+  <Project Path="libargo.vcxproj" Id="d04981a4-c627-4c28-bbbf-911073c35221" />
+</Solution>

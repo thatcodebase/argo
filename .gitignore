@@ -9,6 +9,7 @@
 *.exe
 *.ich
 *.lib
+*.log
 *.o
 *.obj
 *.pch

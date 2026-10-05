@@ -21,8 +21,7 @@
 #include <cstdint> // uint8_t
 #include <cstdio> // printf
 #include <cstdlib> // free
-
-// Private definitions relevant to the entire app.
+#include <time.h> // time
 
 enum {
     cond_base_socket = 300,
@@ -47,8 +46,8 @@ enum {
 #define HILO64(x) ((x << 56) | ((x & 0xFF00) << 40) | ((x & 0xFF0000) << 24) | ((x & 0xFF000000) << 8) | ((x >> 8) & 0xFF000000) | ((x >> 24) & 0xFF0000) | ((x >> 40) & 0xFF00) | (x >> 56))
 
 #if defined(_WIN32)
-using socklet_t int;
-using ssize_t int;
+using socklen_t = int;
+using ssize_t = int;
 #else
 #if defined(__linux__)
 using SOCKET = size_t;
